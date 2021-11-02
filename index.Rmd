@@ -3,13 +3,13 @@ title: 'Project 1: Wrangling, Exploration, Visualization'
 author: "SDS322E"
 date: ''
 output:
-  pdf_document:
-    toc: no
   html_document:
     toc: yes
     toc_float:
       collapsed: no
       smooth_scroll: yes
+  pdf_document:
+    toc: no
 ---
 
 ```{r setup, include=FALSE}
