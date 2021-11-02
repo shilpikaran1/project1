@@ -3,13 +3,13 @@ title: 'Project 1: Wrangling, Exploration, Visualization'
 author: "SDS322E"
 date: ''
 output:
+  pdf_document:
+    toc: no
   html_document:
     toc: yes
     toc_float:
       collapsed: no
       smooth_scroll: yes
-  pdf_document:
-    toc: no
 ---
 
 ```{r setup, include=FALSE}
@@ -19,14 +19,18 @@ tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
 
 ## Data Wrangling, Exploration, Visualization
 
-### Name and EID here
+### Shilpi Karan sk46966
 
 #### Introduction 
 
-Paragraph or two introducing your datasets and variables, why they are interesting to you, etc.
+The two data sets used in this project are the U.S. State Public School Expenditures dataset and the Violent Crime Rates by US State dataset. The common ID variable that they share is states. Other variables that are in the data sets include murder, assault, urbanpop, and rape in dataset 1 and education, income, young, and urban in dataset2. The variables were acquired by looking at per-capital values and by collecting data from populations of 1,000 or 100,000 people and creating a proportion from that. These data sets and variables were interesting for me because I wanted to know if there is a correlation between education/income and crime rates in America.
 
 ```{R}
-# read your datasets in here, e.g., with read_csv()
+
+library(tidyverse)
+
+data1 <- read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/datasets/USArrests.csv")
+data2 <- read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/carData/Anscombe.csv")
 
 ```
 
@@ -35,56 +39,224 @@ Paragraph or two introducing your datasets and variables, why they are interesti
 If your datasets are tidy already, demonstrate that you can reshape data with pivot wider/longer here (e.g., untidy and then retidy). Alternatively, it may be easier to wait until the wrangling section so you can reshape your summary statistics. Note here if you are going to do this.
 
 ```{R}
-# your tidying code (if applicable; can also wait until wrangling section)
+
+data1
+data2
+#UNTIDY
+data1 <- data1 %>% pivot_wider(names_from = X1, values_from = Murder)
+data2 <- data2 %>% pivot_wider(names_from = X1, values_from = education)
+
+data1
+data2
+#TIDY
+data1 <- data1 %>% pivot_longer(cols = Alabama:Wyoming, names_to = "X1", values_to = "Murder", values_drop_na = TRUE)
+data2 <- data2 %>% pivot_longer(cols = ME:HI, names_to = "X1", values_to = "education", values_drop_na = TRUE)
+
+data1
+data2
+
+data1 <- data1 %>% relocate(X1, .before = Assault)
+data2 <- data2 %>% relocate(X1, .before = income)
+
+data1
+data2
+
+
 ```
 
     
 #### Joining/Merging
 
 ```{R}
-# your joining code
 
-# your joining code
+library(dplyr)
+
+data2[1,1] <- "Alaska"
+data2[2,1] <- "Alabama"
+data2[3,1] <- "Arkansas"
+data2[4,1] <- "Arizona"
+data2[5,1] <- "California"
+data2[6,1] <- "Colorado"
+data2[7,1] <- "Connecticut"
+data2[8,1] <- "Delaware"
+data2[9,1] <- "Florida"
+data2[10,1] <- "Georgia"
+data2[11,1] <- "Hawaii"
+data2[12,1] <- "Idaho"
+data2[13,1] <- "Illinois"
+data2[14,1] <- "Indiana"
+data2[15,1] <- "Iowa"
+data2[16,1] <- "Kansas"
+data2[17,1] <- "Kentucky"
+data2[18,1] <- "Louisiana"
+data2[19,1] <- "Massachusetts"
+data2[20,1] <- "Maryland"
+data2[21,1] <- "Maine"
+data2[22,1] <- "Michigan"
+data2[23,1] <- "Minnesota"
+data2[24,1] <- "Missouri"
+data2[25,1] <- "Mississippi"
+data2[26,1] <- "Montana"
+data2[27,1] <- "North Carolina"
+data2[28,1] <- "North Dakota"
+data2[29,1] <- "Nebraska"
+data2[30,1] <- "New Hampshire"
+data2[31,1] <- "New Jersey"
+data2[32,1] <- "New Mexico"
+data2[33,1] <- "Nevada"
+data2[34,1] <- "New York"
+data2[35,1] <- "Ohio"
+data2[36,1] <- "Oklahoma"
+data2[37,1] <- "Oregon"
+data2[38,1] <- "Pennsylvania"
+data2[39,1] <- "Rhode Island"
+data2[40,1] <- "South Carolina"
+data2[41,1] <- "South Dakota"
+data2[42,1] <- "Tennessee"
+data2[43,1] <- "Texas"
+data2[44,1] <- "Utah"
+data2[45,1] <- "Virginia"
+data2[46,1] <- "Vermont"
+data2[47,1] <- "Washington"
+data2[48,1] <- "Wisconsin"
+data2[49,1] <- "West Virginia"
+data2[50,1] <- "Wyoming"
+
+data2 <- data2 %>% arrange(data2)
+data2
+
+data3 <- full_join(data1,data2)
+data3
+
+
+#data1 <- data1 %>%
+  #rename(States = X1)
+#data2 <- data2 %>%
+  #rename(States = X1)
+data1
+data2
+
+dim(data1)
+dim(data2)
+dim(data3)
+
+colnames(data1)
+colnames(data2)
 ```
 
-Discussions of joining here. Feel encouraged to break up into more than once code chunk and discuss each in turn.
+Datasets 1 and 2 were full joined. I used full join because both datasets have the same matching rows so it would make no difference and thus be of no use to do inner, left, or right join. There are 50 observations/rows in each dataset. The ID that the datasets have in common is states. The unique IDs in dataset 1 that are not in dataset 2 are murder, assault, urbanpop, and rape. The other IDs are unique to dataset 2, and they are education, income, young, and urban. The size of the joined dataset is larger than the individual datasets. It has 9 variables/columns while the individual datasets had 5 columns/variables each. There were no observations dropped, and so there is also no problem associated with it.
 
 ####  Wrangling
 
 ```{R}
-# your wrangling code
+data3 %>% arrange(income)
+data3 %>% filter(str_detect(Rape, "17.4"))
+data3 %>% filter(urban >= 500)
+data3 %>% select(X1, Murder, income)
+data3 %>% mutate(ratio = Murder/income)
 
-# your wrangling code
+data3$lh_UrbanPop <- as.factor(ifelse(data3$UrbanPop < 50, "low", "high"))
+data3
 
-# your wrangling code
+data3 %>% group_by(lh_UrbanPop) %>% summarize(counts=n())
+
+data3 %>% group_by(lh_UrbanPop) %>% summarize(mean(education, na.rm=T))
+data3 %>% group_by(lh_UrbanPop) %>% summarize(sd(education, na.rm=T))
+data3 %>% summarize(max(education, na.rm=T))
+data3 %>% summarize(min(education, na.rm=T))
+data3 %>% summarize(median(education, na.rm=T))
+
+data3 %>% group_by(lh_UrbanPop) %>% summarize(mean(Murder, na.rm=T))
+data3 %>% group_by(lh_UrbanPop) %>% summarize(sd(Murder, na.rm=T))
+data3 %>% summarize(max(Murder, na.rm=T))
+data3 %>% summarize(min(Murder, na.rm=T))
+data3 %>% summarize(median(Murder, na.rm=T))
+
+data3 %>% group_by(lh_UrbanPop) %>% summarize(mean(income, na.rm=T))
+data3 %>% group_by(lh_UrbanPop) %>% summarize(sd(income, na.rm=T))
+data3 %>% summarize(max(income, na.rm=T))
+data3 %>% summarize(min(income, na.rm=T))
+data3 %>% summarize(median(income, na.rm=T))
+
+data3 %>% group_by(lh_UrbanPop) %>% summarize(mean(UrbanPop, na.rm=T))
+data3 %>% group_by(lh_UrbanPop) %>% summarize(sd(UrbanPop, na.rm=T))
+data3 %>% summarize(max(UrbanPop, na.rm=T))
+data3 %>% summarize(min(UrbanPop, na.rm=T))
+data3 %>% summarize(median(UrbanPop, na.rm=T))
+
+data3 %>% group_by(lh_UrbanPop) %>% summarize(mean(Assault, na.rm=T))
+data3 %>% group_by(lh_UrbanPop) %>% summarize(sd(Assault, na.rm=T))
+data3 %>% summarize(max(Assault, na.rm=T))
+data3 %>% summarize(min(Assault, na.rm=T))
+data3 %>% summarize(median(Assault, na.rm=T))
+
+data3 %>% group_by(lh_UrbanPop) %>% summarize(mean(young, na.rm=T))
+data3 %>% group_by(lh_UrbanPop) %>% summarize(sd(young, na.rm=T))
+data3 %>% summarize(max(young, na.rm=T))
+data3 %>% summarize(min(young, na.rm=T))
+data3 %>% summarize(median(young, na.rm=T))
+
+data3 %>% group_by(lh_UrbanPop) %>% summarize(mean(Rape, na.rm=T))
+data3 %>% group_by(lh_UrbanPop) %>% summarize(sd(Rape, na.rm=T))
+data3 %>% summarize(max(Rape, na.rm=T))
+data3 %>% summarize(min(Rape, na.rm=T))
+data3 %>% summarize(median(Rape, na.rm=T))
+
+data3 %>% group_by(lh_UrbanPop) %>% summarize(mean(urban, na.rm=T))
+data3 %>% group_by(lh_UrbanPop) %>% summarize(sd(urban, na.rm=T))
+data3 %>% summarize(max(urban, na.rm=T))
+data3 %>% summarize(min(urban, na.rm=T))
+data3 %>% summarize(median(urban, na.rm=T))
+
+data3 %>% group_by(lh_UrbanPop) %>% summarize(mean(education/income, na.rm=T))
+data3 %>% group_by(lh_UrbanPop) %>% summarize(sd(education/income, na.rm=T))
+data3 %>% summarize(max(education/income, na.rm=T))
+data3 %>% summarize(min(education/income, na.rm=T))
+data3 %>% summarize(median(education/income, na.rm=T))
+
+percent_decimal <- function(UrbanPop) {
+  DecUrbanPop <- (UrbanPop/100)
+  return(DecUrbanPop)
+}
+
+data3 %>% summarize(percent_decimal(max(UrbanPop, na.rm=T)))
+
+
+#gt_tbl <- gt(data3 %>% group_by(lh_UrbanPop) %>% summarize(counts=n()))
+#gt_tbl
+
 ```
 
-Your discussion of wrangling section here. Feel encouraged to break up into more than once code chunk and discuss each in turn.
-
+To start off, the data was arranged based on income. Then, it was filtered for certain variables, selected for other variables, and mutated for certain values. All of this was done to better understand the relationship (and if there was one or not) between crime rates and income/education. A new categorical variable was created that sorted the data into high and low urbanpop percentages. Later, the data was grouped by the new categorical variable that was created and it was also used in the summaries in which, mean, median, max, min, and standard deviation values were determined for each variable. The counts for the low and high urbanpop was also determined. One table was also styled with a gt package. A new function was also created to help with making sense of the data more. Byfar, the most interesting finding was that a larger than expected amount of the U.S. population lived in urban areas). Another interesting finding was that, there is one state where .91 out of 1 of the population lives in Urban areas (noted as a decimal), and this is indicated by the function that was created.
 
 #### Visualizing
 
 ```{R}
-# your plot 1
+ggplot(data3, aes(x=education)) + geom_histogram(aes(y=..density..), bins=15)+geom_density(color="red") + theme_grey() + scale_x_continuous(labels=scales::dollar) + ggtitle("Frequency of Per-Capita Education Expenditures in Dollars")
 ```
 
-Your discussion of plot 1
+The plot depicts the amount of money that was spent per-capita on education in dollars. The relationships/trends that are apparent from this histograpm and density line is that most people did not spend as much on education and that the majority spent around $180. The plot shows mainly a normal distribution bell curve with a potential outlier to the far right. Overall, this plot indicates that the majority of the population spends similar amounts of money towards education relative to one another.
 
 ```{R}
-# your plot 2
+
+ggplot(data3, aes(x = income)) +
+geom_bar(aes(y=X1), stat="summary", width=.8) + geom_density() + theme_light() + scale_x_continuous(labels=scales::dollar) + ggtitle("Per-capita Income in Each U.S. State in Dollars")
+
 ```
 
-Your discussion of plot 2
+The barplot shown above depicts income per-capita, in dollars, in each U.S. state. There is no apparent trend or relationship shown from this plot. It is only apparent that some states have a much higher per-capita income than other states. This just shows the variations of incomes between different states.
 
 ```{R}
-# your plot 3
+
+ggplot(data = data3, aes(x = income, y = Murder)) + geom_point(aes(color='red')) + geom_smooth(method="lm") + theme_dark() + scale_x_continuous(labels=scales::dollar) + scale_y_continuous(breaks=seq(0,18,1)) +
+ggtitle("Murder vs. Income Correlation Scatter Plot")
 ```
 
-Your discussion of plot 3
+The scatterplot above shows the correlation between murder and income. Based on the plot, it is apparent that there is no correlation between the two variables. There is no obvious relationship as the values for income and murder for each state is mainly scattered. The trendline also shows that there is no positive or negative linear relationship.
 
 #### Concluding Remarks
 
-If any!
+We cannot conclude anything from this data in regards to the relation between education/income values and crime rates. There does not seem to be an apparent relationship from the data that was collected, so there cannot be a conclusion or generalization made from it.
 
 
 
